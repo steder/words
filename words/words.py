@@ -14,6 +14,7 @@ dictionary = None
 
 
 def main():
+    global dictionary
     print "Constructing new dictionary..."
     start = time.time()
     dictionary = wordlib.Dictionary()
