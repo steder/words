@@ -1,4 +1,7 @@
 """
+Defines a :class:`Dictionary` that supports various queries
+useful in playing Scrabble or Words with Friends.
+
 """
 
 from functools import wraps
@@ -6,7 +9,7 @@ import itertools
 import string
 
 
-WOF = "WORDS_WITH_FRIENDS"
+WWF = "WORDS_WITH_FRIENDS"
 SCRABBLE = "SCRABBLE"
 SCORES = {
     SCRABBLE: {"a":1,
@@ -35,7 +38,7 @@ SCORES = {
                "x":1,
                "y":1,
                "z":1,},
-    WOF: {
+    WWF: {
     "a":1,
     "b":4,
     "c":4,
@@ -72,7 +75,16 @@ SCORES = {
 # scrabble lookups.
 def factorial(n):
     """
-    recursive factorial is so bourgeois :-)
+    Calculate n!
+
+    .. note:: This is an iterative implementation of factorial.
+        Recursive factorial is so bourgeois. :-)
+
+        Seriously it is nice to have the option to be able to calculate factorial
+        bigger than sys.getrecursionlimit().
+
+    :arg n:
+    :type n: int
     """
     f = 1
     for x in xrange(1, n+1):
@@ -94,6 +106,9 @@ EOW = 0
 
 
 class Dictionary(object):
+    """
+    Not a Python dictionary but an actual dictionary of words
+    """
     def __init__(self):
         self.nodeCount = 0
         self.wordCount = 0
@@ -103,17 +118,32 @@ class Dictionary(object):
         self.trie = {}
 
     def cleanWord(f):
+        """
+        Method decorator to help methods of this class keep it DRY.
+        """
+        @wraps(f)
         def cleanWordDeco(self, word):
             return f(self, word.strip().lower())
-        wraps(f, cleanWordDeco)
         return cleanWordDeco
 
     @cleanWord
     def insertWord(self, word):
+        """
+        Insert a word into the dictionaries indexes.
+
+        :arg word: The word to insert
+        :type arg: str
+        """
         self.insertNode(word)
         self.insertTrie(word)
 
     def insertNode(self, word):
+        """
+        Store anagrams in a hash table keyed on sorted version of `word`
+
+        :arg word: The word to insert
+        :type word: str
+        """
         letters = "".join(sorted(word))
         if letters not in self.nodes:
             self.wordCount += 1
@@ -124,6 +154,12 @@ class Dictionary(object):
             self.nodes[letters].append(word)
 
     def insertTrie(self, word):
+        """
+        Store `word` in a trie for efficient prefix/suffix lookups.
+
+        :arg word: The word to insert
+        :type word: str
+        """
         trieNode = self.trie
         for letter in word:
             if not letter in trieNode:
@@ -133,6 +169,13 @@ class Dictionary(object):
 
     @cleanWord
     def getWord(self, word):
+        """
+        Check if `word` is a valid word.
+
+        :arg word: The word to lookup
+        :type word: str
+        :returns: Returns the word found or none.
+        """
         letters = "".join(sorted(word))
         words = self.nodes.get(letters, [])
         if word in words:
@@ -142,23 +185,38 @@ class Dictionary(object):
 
     @cleanWord
     def getAnagrams(self, word):
+        """
+        :arg word: The word to lookup
+        :type word: str
+        :returns: Returns list of anagrams for `word`
+        """
         letters = "".join(sorted(word))
         words = self.nodes.get(letters, [])
         return words
 
     @cleanWord
     def getScore(self, word):
-        scores = SCORES[WOF]
+        """
+        Compute Words With Friends score for a given word.
+
+        :arg word: any string although it should be a valid word
+        :type word: str
+        :returns: Returns a tuple of the score of that word in Words with Friends (int) and the word (str)
+        """
+        scores = SCORES[WWF]
         score = sum(map(lambda x: scores[x], word))
         return score, word
 
     @cleanWord
     def getScrabbleWords(self, letters):
+        """
+        Given a set of scrambled letters return a list of all the unique words
+        that can be spelled with those letters sorted by their WWF score.
+        """
         lookupCount = 0
         words = []
         letters = "".join(sorted(letters))
         for n in xrange(2, len(letters)+1):
-            print "Trying %s length permutations of %s"%(n, letters)
             for combination in itertools.combinations(letters, n):
                 candidate = "".join(combination)
                 lookupCount += 1
@@ -169,14 +227,21 @@ class Dictionary(object):
         # remove duplicates and sort appropriately
         words = map(self.getScore, set(words))
         words.sort()
-
-        print "Found words in %s lookups."%(lookupCount,)
         return words
 
     @cleanWord
     def getScrabbleWordsWithWildcards(self, letters):
         """
-        any '*' characters in letters indicate wildcards.
+        Given a set of scrambled letters (including wildcards) return a list of
+        all the unique words that can be spelled with those letters sorted by their
+        WWF score.
+
+        .. note:: any '*' characters in letters indicate wildcards.
+
+        :arg letters: letters and wildcards that to search for in the dictionary
+        :type letters: str
+        :returns: Unique list of words sorted by WWF score.
+
         """
         lookupCount = 0
         wildcard, blank = "*", ""
@@ -203,9 +268,12 @@ class Dictionary(object):
     @cleanWord
     def getWordsStartingWith(self, letters):
         """
-        :arg: letters
+        Return a list of words beginning with `letters`
 
-        Returns a list of words beginning with letters
+        :arg letters:
+        :type letters: str
+        :returns: list
+
         """
         trieNode = self.trie
         for letter in letters:
