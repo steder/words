@@ -21,10 +21,10 @@ setup(name="Words",
     keywords="scrabble dictionary",
     url="https://github.com/steder/words",
 
-    entry_points={
-        'console_scripts':
-            ['words_console = words.words:main'],
-        },
+    # entry_points={
+    #     'console_scripts':
+    #         ['words_console = words.console:main'],
+    #     },
     test_suite="words.test_wordlib",
     # could also include long_description, download_url, classifiers, etc.
 )
