@@ -1,3 +1,5 @@
+#-*- test-case-name: words.test_wordlib -*-
+
 """
 Defines a :class:`Dictionary` that supports various queries
 useful in playing Scrabble or Words with Friends.
@@ -116,6 +118,8 @@ class Dictionary(object):
         # store words in a trie for lookups of
         # all words starting with a prefix
         self.trie = {}
+        # suffix lookups:
+        self.suffixTrie = {}
 
     def cleanWord(f):
         """
@@ -155,13 +159,21 @@ class Dictionary(object):
 
     def insertTrie(self, word):
         """
-        Store `word` in a trie for efficient prefix/suffix lookups.
+        Store `word` in trie structures for efficient prefix/suffix lookups.
 
         :arg word: The word to insert
         :type word: str
         """
-        trieNode = self.trie
-        for letter in word:
+        self._insertTrie(self.trie, word)
+        self._insertTrie(self.suffixTrie, reversed(word))
+
+    def _insertTrie(self, trie, letters):
+        """
+        Helper method to store a word in a single trie.
+
+        """
+        trieNode = trie
+        for letter in letters:
             if not letter in trieNode:
                 trieNode[letter] = {}
             trieNode = trieNode[letter]
@@ -262,8 +274,20 @@ class Dictionary(object):
         words = list(set(words))
         words.sort()
 
-        print "Tried %s wildcard lookups."%(lookupCount,)
         return words
+
+    def depthFirstWords(self, letters, trieNode, accumulator):
+        """
+        Recursive depth first traversal of the tree to retrieve all
+        the child words
+
+        """
+        for letter, node in trieNode.iteritems():
+            if letter != EOW and node:
+                if node.get(EOW, False):
+                    accumulator.append("".join(letters + letter))
+                self.depthFirstWords(letters+letter, node, accumulator)
+        return accumulator
 
     @cleanWord
     def getWordsStartingWith(self, letters):
@@ -280,27 +304,48 @@ class Dictionary(object):
             trieNode = trieNode.get(letter, None)
             if not trieNode:
                 return None
-        # now we're at the root trie node for all words that
-        # begin with letters.  we'll want to do a depth
-        # first traversal of the tree to retrieve all the child
-        # words:
-
-        def prefixWords(letters, trieNode, accumulator):
-            for letter, node in trieNode.iteritems():
-                if letter != EOW and node:
-                    print "prefixWords checking word: ", "".join(letters+letter)
-                    if node.get(EOW, False):
-                        accumulator.append("".join(letters + letter))
-                    prefixWords(letters+letter, node, accumulator)
-            return accumulator
 
         words = []
         if trieNode.get(EOW, False):
             words.append("".join(letters))
-        prefixWords(letters, trieNode, words)
+
+        self.depthFirstWords(letters, trieNode, words)
+
         words.sort()
         return words
 
+    def reversedDepthFirstWords(self, letters, trieNode, accumulator):
+        for letter, node in trieNode.iteritems():
+            if letter != EOW and node:
+                if node.get(EOW, False):
+                    accumulator.append("".join(reversed(letters + letter)))
+                self.reversedDepthFirstWords(letters+letter, node, accumulator)
+        return accumulator
 
+    @cleanWord
+    def getWordsEndingWith(self, letters):
+        """
+        Return a list of words ending with `letters`
+
+        :arg letters:
+        :type letters: str
+        :returns: list
+
+        """
+        trieNode = self.suffixTrie
+        letters =  "".join(reversed(letters))
+        for letter in letters:
+            trieNode = trieNode.get(letter, None)
+            if not trieNode:
+                return None
+
+        words = []
+        if trieNode.get(EOW, False):
+            words.append("".join(reversed(letters)))
+
+        self.reversedDepthFirstWords(letters, trieNode, words)
+
+        words.sort()
+        return words
 
 
