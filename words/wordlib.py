@@ -289,17 +289,22 @@ class Dictionary(object):
                 self.depthFirstWords(letters+letter, node, accumulator)
         return accumulator
 
-    @cleanWord
-    def getWordsStartingWith(self, letters):
+    def getWordsFromTrieWithTransform(self, trie, letters, transform):
         """
-        Return a list of words beginning with `letters`
+        Apply `transform` to `letters` and return words in `trie` that
+        match include the transformed letters.
 
+        :arg trie:
+        :type trie: dict
         :arg letters:
         :type letters: str
+        :arg transform:
+        :type transform: callable
         :returns: list
 
         """
-        trieNode = self.trie
+        trieNode = trie
+        letters = transform(letters)
         for letter in letters:
             trieNode = trieNode.get(letter, None)
             if not trieNode:
@@ -311,16 +316,22 @@ class Dictionary(object):
 
         self.depthFirstWords(letters, trieNode, words)
 
+        words = [transform(word) for word in words]
         words.sort()
         return words
 
-    def reversedDepthFirstWords(self, letters, trieNode, accumulator):
-        for letter, node in trieNode.iteritems():
-            if letter != EOW and node:
-                if node.get(EOW, False):
-                    accumulator.append("".join(reversed(letters + letter)))
-                self.reversedDepthFirstWords(letters+letter, node, accumulator)
-        return accumulator
+    @cleanWord
+    def getWordsStartingWith(self, letters):
+        """
+        Return a list of words beginning with `letters`
+
+        :arg letters:
+        :type letters: str
+        :returns: list
+
+        """
+        identity = lambda x: x
+        return self.getWordsFromTrieWithTransform(self.trie, letters, identity)
 
     @cleanWord
     def getWordsEndingWith(self, letters):
@@ -332,20 +343,7 @@ class Dictionary(object):
         :returns: list
 
         """
-        trieNode = self.suffixTrie
-        letters =  "".join(reversed(letters))
-        for letter in letters:
-            trieNode = trieNode.get(letter, None)
-            if not trieNode:
-                return None
-
-        words = []
-        if trieNode.get(EOW, False):
-            words.append("".join(reversed(letters)))
-
-        self.reversedDepthFirstWords(letters, trieNode, words)
-
-        words.sort()
-        return words
+        reverseString = lambda x: "".join(reversed(x))
+        return self.getWordsFromTrieWithTransform(self.suffixTrie, letters, reverseString)
 
 
