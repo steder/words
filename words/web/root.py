@@ -16,7 +16,7 @@ class Root(resource.Resource):
     def __init__(self, server):
         resource.Resource.__init__(self)
         self.server = server
-        self.putChild("static", static.File("words/static"))
+        self.putChild("static", static.File(settings.words_root.child("words").child("static").path))
 
     def _failed(self, reason):
         log.err(reason)
@@ -41,7 +41,7 @@ class Root(resource.Resource):
         self.d = defer.Deferred()
         self.d.addCallback(self._got, request)
         self.d.addErrback(self._failed)
-        reactor.callLater(0.1, self.getStaticFile, self.d)
+        reactor.callLater(0.001, self.getStaticFile, self.d)
         return server.NOT_DONE_YET
 
     def getChild(self, path, request):
