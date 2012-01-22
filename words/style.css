@@ -1,0 +1,98 @@
+﻿header
+{
+	margin-bottom: 20px;
+}
+.centered
+{
+	display: table;
+	margin-left: auto;
+	margin-right: auto;
+}
+#title
+{
+	font-size: 24pt;
+	font-weight: bold;
+	text-shadow: 0 0 0 transparent, 0 2px 2px gainsboro; 
+	text-align: center;
+}
+#subtitle
+{
+	font-size: 18px;
+	font-style: italic;
+	text-align: center;
+}
+#scrabble_input label
+{
+	margin-right: 5px;
+	
+	display: block;
+	clear: both;
+	float: none;
+	
+	text-align: center;
+	color: gray;
+	font-size: 12pt;
+}
+
+#scrabble_input button
+{
+	padding: 3px;
+	border: thin slategrey solid;
+	background-color: yellowgreen;
+}
+#results
+{
+	border-spacing: 0;
+	border: thin #3E5214 solid;
+	border-radius: 12px;
+	margin-top: 20px;
+}
+#results thead:first-child th:first-child
+{
+	border-top-left-radius: 10px;
+} 
+
+#results thead:first-child th:last-child
+{ 
+	border-top-right-radius: 10px;
+}
+
+#results tr:last-child td:first-child
+{
+	border-bottom-left-radius: 10px;
+}
+
+#results tr:last-child td:last-child
+{
+	border-bottom-right-radius: 10px;
+}
+
+#results thead th
+{
+	background-color: #4D6619;
+	font-weight: normal;
+	color: white;
+	text-align: center;
+	padding: 10px 20px 10px 20px;
+	text-shadow:0 0 0 transparent, 0 1px 1px gainsboro; 
+}
+
+#results td
+{
+	padding: 5px 10px 5px 10px;
+}
+
+#results td:last-child
+{
+	border-left: thin #3E5214 solid;
+	text-align: center;
+}
+#results tr:nth-child(odd)
+{
+	background-color: white;
+}
+
+#results tr:nth-child(even)
+{
+	background-color: gainsboro; /* middle blue/gray */
+}
