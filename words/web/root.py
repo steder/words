@@ -17,6 +17,7 @@ class Root(resource.Resource):
         resource.Resource.__init__(self)
         self.server = server
         self.putChild("static", static.File(settings.words_root.child("words").child("static").path))
+        self.putChild("favicon.ico", static.File(settings.words_root.child("words").child("favicon.ico").path))
 
     def _failed(self, reason):
         log.err(reason)
