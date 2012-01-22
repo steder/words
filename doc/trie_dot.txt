@@ -1,0 +1,11 @@
+digraph T {
+     ROOT -> A;
+     A -> N;
+     A -> P1;
+     P1-> P2;
+     P2 -> L;
+     L -> E;
+     ROOT->Y;
+     Y->U;
+     U->M;
+};
