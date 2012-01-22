@@ -32,7 +32,7 @@ class Root(resource.Resource):
         request.finish()
 
     def getStaticFile(self, deferred):
-        filepath = os.path.join(settings.words_root.path, "words/static/root.html")
+        filepath = os.path.join(settings.words_root.path, "words/static/index.html")
         template = open(filepath, "r")
         contents = template.read()
         deferred.callback(contents)
