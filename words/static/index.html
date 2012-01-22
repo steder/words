@@ -4,8 +4,18 @@
 <head>
 <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
 <title>The Scrabbleator!</title>
-<link href="/static/style.css" rel="stylesheet" type="text/css">
+<link href="/static/style.css" rel="stylesheet" type="text/css"/>
 <link rel="icon" type="image/ico" href="favicon.ico" />
+<script type="text/javascript" src="/static/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="/static/words.js"></script>
+<script type="text/javascript">
+$("document").ready(function () {
+    penzilla.dictionary = new penzilla.words.Dictionary(
+        "letters",
+        "results"
+    );
+});
+</script>
 </head>
 
 <body>
@@ -14,12 +24,15 @@
 		<div id="subtitle">... becomes games are more fun when you cheat!</div>
 	</header>
 
-	<form id="scrabble_input" class="centered">
+	<form id="scrabble_input" class="centered" action="javascript:penzilla.words.getScrabbleWords()">
 		<label for="letters">Enter your scrabble letters and we'll let you know which words you can play</label>
-		<div class="centered"><input id="letters" type="text" required><button type="submit">Scrabbleate!</button></div>
+		<div class="centered">
+          <input id="letters" type="text" required>
+          <button type="submit">Scrabbleate!
+        </button></div>
 	</form>
 
-	<table id="results" class="centered">
+	<table id="results" class="centered hidden">
 		<thead>
 			<tr>
 				<th>Word</th>

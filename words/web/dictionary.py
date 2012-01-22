@@ -33,7 +33,7 @@ class DictionaryResource(resource.Resource):
         letters = "".join(lettersArg)
         words = []
         if letters:
-            words = self.dictionary.getScrabbleWordsWithWildcards(letters)
+            words = list(reversed(self.dictionary.getScrabbleWordsWithWildcards(letters)))
         request.setResponseCode(http.OK)
         if self.format == "json":
             data = json.dumps(words)
@@ -47,6 +47,7 @@ class DictionaryResource(resource.Resource):
         return result
 
     def eb(self, error, request):
+        log.err(error)
         request.setResponseCode(http.INTERNAL_SERVER_ERROR)
         request.write(error.getErrorMessage())
         request.finish()

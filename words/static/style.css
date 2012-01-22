@@ -8,11 +8,15 @@
 	margin-left: auto;
 	margin-right: auto;
 }
+.hidden
+{
+    display: none;
+}
 #title
 {
 	font-size: 24pt;
 	font-weight: bold;
-	text-shadow: 0 0 0 transparent, 0 2px 2px gainsboro; 
+	text-shadow: 0 0 0 transparent, 0 2px 2px gainsboro;
 	text-align: center;
 }
 #subtitle
@@ -24,11 +28,11 @@
 #scrabble_input label
 {
 	margin-right: 5px;
-	
+
 	display: block;
 	clear: both;
 	float: none;
-	
+
 	text-align: center;
 	color: gray;
 	font-size: 12pt;
@@ -50,10 +54,10 @@
 #results thead:first-child th:first-child
 {
 	border-top-left-radius: 10px;
-} 
+}
 
 #results thead:first-child th:last-child
-{ 
+{
 	border-top-right-radius: 10px;
 }
 
@@ -74,7 +78,7 @@
 	color: white;
 	text-align: center;
 	padding: 10px 20px 10px 20px;
-	text-shadow:0 0 0 transparent, 0 1px 1px gainsboro; 
+	text-shadow:0 0 0 transparent, 0 1px 1px gainsboro;
 }
 
 #results td
