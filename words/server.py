@@ -12,15 +12,17 @@ from words.web import root
 
 
 class WordsServer(service.MultiService):
-    def __init__(self, port):
+    def __init__(self, port, dictionary):
+        self.dictionary = dictionary
+
         service.MultiService.__init__(self)
-        webServerFactory = server.Site(root.Root())
+        webServerFactory = server.Site(root.Root(self))
         webServer = internet.TCPServer(port, webServerFactory)
         webServer.setName("Words")
         webServer.setServiceParent(self)
 
     def _cbStarted(self, result):
-        service.MultiService.startService(self)        
+        service.MultiService.startService(self)
         return result
 
     def _ebError(self, failure):
@@ -41,5 +43,4 @@ class WordsServer(service.MultiService):
         return d
 
     def stopService(self):
-        print "Shutting down service:"
         return service.MultiService.stopService(self)

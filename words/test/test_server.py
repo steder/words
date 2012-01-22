@@ -2,20 +2,26 @@ from twisted.python import failure
 from twisted.trial import unittest
 
 from words import server
+from words import wordlib
+
 
 class TestWordsServer(unittest.TestCase):
     def setUp(self):
         portNumber = 6666
-        self.server = server.WordsServer(portNumber)
-        
+        self.dictionary = wordlib.Dictionary()
+        self.server = server.WordsServer(portNumber, self.dictionary)
+
     def test_serverName(self):
         self.assertEqual(None, self.server.name
                          )
 
+    def test_dictionary(self):
+        self.assertEqual(self.server.dictionary, self.dictionary)
+
 class TestWordsServerStart(unittest.TestCase):
     def setUp(self):
         portNumber = 6666
-        self.server = server.WordsServer(portNumber)
+        self.server = server.WordsServer(portNumber, None)
         def _fakeServiceCallback(result):
             return result
         self.server._cbStarted = _fakeServiceCallback
@@ -25,7 +31,6 @@ class TestWordsServerStart(unittest.TestCase):
         return d
 
     def _startSuccess(self, result):
-        print "test_server._startSuccess:", result
         self.assertEqual(True, result, "Expect server start to return true result")
         return result
 
@@ -54,5 +59,4 @@ class TestWordsServerStart(unittest.TestCase):
         d.addCallbacks(callback=self._startShouldNotSucceed,
                        errback=self._startShouldFail)
         return d
-        
 

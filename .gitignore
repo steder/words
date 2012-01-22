@@ -1,0 +1,6 @@
+*.pyc
+dropin.cache
+_trial_temp
+doc/_build
+*.egg-info
+.coverage
