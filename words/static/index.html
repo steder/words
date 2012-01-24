@@ -31,8 +31,9 @@ $("document").ready(function () {
 		<label for="letters">Enter your scrabble letters and we'll let you know which words you can play</label>
 		<div class="centered">
           <input id="letters" type="text" required>
-          <button type="submit">Scrabbleate!
-        </button></div>
+          <button type="submit">Scrabbleate!</button>
+          <div id="spinner" class="centered hidden"><img src="static/ajax-loader.gif"/></div>
+        </div>
 	</form>
 
 	<table id="results" class="centered hidden">

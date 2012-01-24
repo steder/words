@@ -60,23 +60,13 @@ class TestDictionaryResource(unittest.TestCase):
         self.r.handle_GET = fail
 
         request = test_web.DummyRequest([''])
+        request.args["letters"] = ["ehllo"]
         request.method = "GET"
         rval = self.r.render(request)
         self.assertEqual(rval, server.NOT_DONE_YET)
         def eb(result, request):
             self.assertEqual(request.responseCode, 500, "Response code should be INTERNAL_SERVER_ERROR")
         self.r.d.addCallback(eb, request)
-        return self.r.d
-
-    def test_getScrabbleWords_noLetters(self):
-        request = test_web.DummyRequest([''])
-        request.args["letters"] = []
-        request.method = "GET"
-        rval = self.r.render(request)
-        self.assertEqual(rval, server.NOT_DONE_YET)
-        def cb(result):
-            self.assertEqual(result, [])
-        self.r.d.addCallbacks(cb, self.fail)
         return self.r.d
 
     def test_getScrabbleWords_letters_ehllo(self):
@@ -111,3 +101,31 @@ class TestJsonDictionaryResource(unittest.TestCase):
             self.assertEqual(request.written, ['[[9, "hello"]]'])
         self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
         return self.r.d
+
+    def test_tooManyLetters(self):
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["abcdefghijk"]
+        request.method = "GET"
+        rval = self.r.render(request)
+        self.assertEqual(rval, '[[0, "Please use 10 characters or less"]]')
+
+    def test_tooManyWildcards(self):
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["****"]
+        request.method = "GET"
+        rval = self.r.render(request)
+        self.assertEqual(rval, '[[0, "Please use 3 or fewer wildcards (*)"]]')
+
+    def test_noLetters(self):
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = []
+        request.method = "GET"
+        rval = self.r.render(request)
+        self.assertEqual(rval, '[[0, "Please enter up to 10 letters (including 3 \'*\' wildcards)"]]')
+
+    def test_notAllowedCharacters(self):
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = [":-("]
+        request.method = "GET"
+        rval = self.r.render(request)
+        self.assertEqual(rval, '[[0, "Please enter up to 10 letters (including 3 \'*\' wildcards)"]]')

@@ -5,6 +5,18 @@ penzilla.words.Dictionary = function (input_id, output_id) {
     var self = this;
     self.input_id = input_id;
     self.output_id = output_id;
+
+    $.ajaxSetup({
+        beforeSend: function() {
+            $("#spinner").show();
+        },
+        complete: function() {
+            $("#spinner").hide();
+            var input = document.getElementById(self.input_id);
+            input.value = "";
+
+        }
+    });
 };
 
 penzilla.words.Dictionary.prototype.getScrabbleWords = function () {
