@@ -36,7 +36,7 @@ penzilla.words.Dictionary.prototype.getScrabbleWords = function () {
     };
 
     console.log("letters:" + letters);
-    $.getJSON("/dictionary.json?", {"letters":letters}, onSuccess);
+    $.getJSON("dictionary.json?", {"letters":letters}, onSuccess);
 };
 
 penzilla.words.getScrabbleWords = function (event) {
