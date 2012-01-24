@@ -102,6 +102,18 @@ class TestJsonDictionaryResource(unittest.TestCase):
         self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
         return self.r.d
 
+    def test_getScrabbleWords_letters_EHLLO(self):
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["EHLLO"]
+        request.method = "GET"
+        rval = self.r.render(request)
+        self.assertEqual(rval, server.NOT_DONE_YET)
+        def cb(result, request):
+            self.assertEqual(result, [(9, "hello")])
+            self.assertEqual(request.written, ['[[9, "hello"]]'])
+        self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
+        return self.r.d
+
     def test_tooManyLetters(self):
         request = test_web.DummyRequest([''])
         request.args["letters"] = ["abcdefghijk"]
@@ -129,3 +141,5 @@ class TestJsonDictionaryResource(unittest.TestCase):
         request.method = "GET"
         rval = self.r.render(request)
         self.assertEqual(rval, '[[0, "Please enter up to 10 letters (including 3 \'*\' wildcards)"]]')
+
+
