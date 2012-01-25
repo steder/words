@@ -13,7 +13,8 @@
 $("document").ready(function () {
     penzilla.dictionary = new penzilla.words.Dictionary(
         "letters",
-        "results"
+        "results",
+        "scrabbleate"
     );
 });
 </script>
@@ -31,7 +32,7 @@ $("document").ready(function () {
 		<label for="letters">Enter your scrabble letters and we'll let you know which words you can play</label>
 		<div class="centered">
           <input id="letters" type="text" required>
-          <button type="submit">Scrabbleate!</button>
+          <button id="scrabbleate" type="submit">Scrabbleate!</button>
           <div id="spinner" class="centered hidden"><img src="static/ajax-loader.gif"/></div>
         </div>
 	</form>

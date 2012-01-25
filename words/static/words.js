@@ -1,20 +1,26 @@
 var penzilla = {};
 penzilla.words = {};
 
-penzilla.words.Dictionary = function (input_id, output_id) {
+penzilla.words.Dictionary = function (input_id, output_id, button_id) {
     var self = this;
     self.input_id = input_id;
     self.output_id = output_id;
+    self.button_id = button_id;
 
     $.ajaxSetup({
         beforeSend: function() {
             $("#spinner").show();
+            var input = document.getElementById(self.input_id);
+            var button = document.getElementById(self.button_id);
+            input.disabled = true;
+            button.disabled = true;
         },
         complete: function() {
             $("#spinner").hide();
             var input = document.getElementById(self.input_id);
-            input.value = "";
-
+            var button = document.getElementById(self.button_id);
+            input.disabled = false;
+            button.disabled = false;
         }
     });
 };
