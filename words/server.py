@@ -21,6 +21,22 @@ class WordsServer(service.MultiService):
         webServer.setName("Words")
         webServer.setServiceParent(self)
 
+    def setServiceParent(self, application):
+        self.application = application
+        self.customizeLogging(application)
+        service.Service.setServiceParent(self, application)
+
+    def customizeLogging(self, application):
+        from twisted.python import logfile
+        self.daily = True
+        self.logFile = "twistd.log"
+        self.logDirectory = "."
+
+        if self.daily:
+            lf = logfile.DailyLogFile(self.logFile, self.logDirectory)
+            observer = log.FileLogObserver(lf).emit
+            self.application.setComponent(log.ILogObserver, observer)
+
     def _cbStarted(self, result):
         service.MultiService.startService(self)
         return result
