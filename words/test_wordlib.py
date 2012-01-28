@@ -357,7 +357,7 @@ class TestPrefixLookups(unittest.TestCase):
 
     def test_not_in_dictionary(self):
         words = self.d.getWordsStartingWith("blah")
-        self.assertEqual(words, None)
+        self.assertEqual(words, [])
 
 
 class TestSuffixLookups(unittest.TestCase):
@@ -390,4 +390,44 @@ class TestSuffixLookups(unittest.TestCase):
 
     def test_not_in_dictionary(self):
         words = self.dictionary.getWordsEndingWith("blah")
-        self.assertEqual(words, None)
+        self.assertEqual(words, [])
+
+
+class TestPrefixLookupsWithLetters(unittest.TestCase):
+    """
+    If you have the dictionary with words:
+      'bar'
+      'baz'
+      'bazil'
+      'bazooka'
+      'bingo'
+
+    And you have a hand with 'gzrilpt'.
+
+    If you want all the words beginningn with 'baz'
+    then we should return 'bazil' and not bazooka
+    because we have the letters to spell 'bazil'
+    but not enough / or the right kind of letters to spell
+    'bazooka' or 'bazill'.
+
+    """
+    WORDS = ["bar",
+             "baz",
+             "bazil",
+             "bazooka",
+             "bazill",
+             "bingo"]
+
+    def setUp(self):
+        self.dictionary = wordlib.Dictionary()
+        for word in self.WORDS:
+            self.dictionary.insertWord(word)
+
+    def test_startsWithBazAndHandContainsGzrilpt(self):
+        #self.assertEqual(self.dictionary.getWordsEndingWith("grate"),
+        #                 ["denigrate", "grate", "integrate"])
+        self.assertEqual(
+            self.dictionary.getWordsStartingWithPrefixContainingLetters("baz", "gzrilpt"),
+            ["bazil"]
+        )
+

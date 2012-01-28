@@ -7,6 +7,10 @@ penzilla.words.Dictionary = function (input_id, output_id, button_id) {
     self.output_id = output_id;
     self.button_id = button_id;
 
+    $("#advanced").click(function (event) {
+        $("#advanced_options").toggle();
+    });
+
     $.ajaxSetup({
         beforeSend: function() {
             $("#spinner").show();
@@ -54,7 +58,18 @@ penzilla.words.Dictionary.prototype.getScrabbleWords = function () {
     };
 
     console.log("letters:" + letters);
-    $.getJSON("dictionary.json?", {"letters":letters}, onSuccess);
+    var data = {"letters":letters};
+    var prefix_letters = document.getElementById("prefix_letters").value;
+    if (prefix_letters) {
+        console.log("Adding prefix_letters");
+        data["prefix_letters"] = prefix_letters;
+    }
+    var suffix_letters = document.getElementById("suffix_letters").value;
+    if (suffix_letters) {
+        console.log("Adding suffix_letters");
+        data["suffix_letters"] = suffix_letters;
+    }
+    $.getJSON("dictionary.json?", data, onSuccess);
 };
 
 penzilla.words.getScrabbleWords = function (event) {
