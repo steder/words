@@ -27,15 +27,14 @@ class WordsServer(service.MultiService):
         service.Service.setServiceParent(self, application)
 
     def customizeLogging(self, application):
-        from twisted.python import logfile
-        self.daily = True
-        self.logFile = "twistd.log"
-        self.logDirectory = "."
+        """Placeholder in case we need to modify the
+        application later on.
 
-        if self.daily:
-            lf = logfile.DailyLogFile(self.logFile, self.logDirectory)
-            observer = log.FileLogObserver(lf).emit
-            self.application.setComponent(log.ILogObserver, observer)
+        For example, in this method we could do::
+
+          application.setComponent(log.ILogObserver, observer)
+
+        """
 
     def _cbStarted(self, result):
         service.MultiService.startService(self)
