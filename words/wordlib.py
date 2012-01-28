@@ -308,7 +308,7 @@ class Dictionary(object):
         for letter in letters:
             trieNode = trieNode.get(letter, None)
             if not trieNode:
-                return None
+                return []
 
         words = []
         if trieNode.get(EOW, False):
@@ -332,6 +332,9 @@ class Dictionary(object):
         """
         identity = lambda x: x
         return self.getWordsFromTrieWithTransform(self.trie, letters, identity)
+
+    def getWordsStartingWithPrefixContainingLetters(self, prefix, letters):
+        return []
 
     @cleanWord
     def getWordsEndingWith(self, letters):

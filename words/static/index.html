@@ -31,8 +31,13 @@ $("document").ready(function () {
 	<form id="scrabble_input" class="centered" action="javascript:penzilla.words.getScrabbleWords()">
 		<label for="letters">Enter your scrabble letters and we'll let you know which words you can play</label>
 		<div class="centered">
+          <input id="advanced" type="checkbox">
           <input id="letters" type="text" required>
           <button id="scrabbleate" type="submit">Scrabbleate!</button>
+          <div id="advanced_options" class="centered hidden" >
+            <span>Starts with: <input id="prefix_letters" type="text"></span>
+            <span>Ends with: <input id="suffix_letters" type="text"></span>
+          </div>
           <div id="spinner" class="centered hidden"><img src="static/ajax-loader.gif"/></div>
         </div>
 	</form>
