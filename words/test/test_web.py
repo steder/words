@@ -144,22 +144,22 @@ class TestJsonDictionaryResource(unittest.TestCase):
         rval = self.r.render(request)
         self.assertEqual(rval, '[[0, "Please enter up to 10 letters (including 3 \'*\' wildcards)"]]')
 
-    # def test_prefixLetters(self):
-    #     """
-    #     If a request specifies query arg 'prefix_letters' we should
-    #     return only words that can be spelled with those letters
-    #     and that begin with prefix_letters.
-    #     """
-    #     request = test_web.DummyRequest([''])
-    #     request.args["letters"] = ["barz"]
-    #     request.args["prefix_letters"] = ["foo"]
-    #     rval = self.r.render(request)
-    #     self.assertEqual(rval, server.NOT_DONE_YET)
-    #     def cb(result, request):
-    #         self.assertEqual(result, [(9, "hello")])
-    #         self.assertEqual(request.written, ['[[9, "hello"]]'])
-    #     self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
-    #     return self.r.d
+    def test_prefixLetters(self):
+        """
+        If a request specifies query arg 'prefix_letters' we should
+        return only words that can be spelled with those letters
+        and that begin with prefix_letters.
+        """
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["barz"]
+        request.args["prefix_letters"] = ["foo"]
+        rval = self.r.render(request)
+        self.assertEqual(rval, server.NOT_DONE_YET)
+        def cb(result, request):
+            self.assertEqual(result, [(12, "foobar")])
+            self.assertEqual(request.written, ['[[12, "foobar"]]'])
+        self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
+        return self.r.d
 
 
 

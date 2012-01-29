@@ -35,16 +35,28 @@ class DictionaryResource(resource.Resource):
         else:
             self.format = "text"
 
-    def getLetters(self, request):
-        lettersArg = request.args.get("letters", [])
+    def getLetterArg(self, arg, request):
+        lettersArg = request.args.get(arg, [])
         letters = "".join(lettersArg)
         letters = regex.sub("", letters)
         return letters
 
+    def getLetters(self, request):
+        return self.getLetterArg("letters", request)
+
+    def getPrefixLetters(self, request):
+        return self.getLetterArg("prefix_letters", request)
+
+    # def getSuffixLetters(self, request):
+    #     return self.getLetterArg("suffix_letters", request)
+
     def handle_GET(self, request):
         letters = self.getLetters(request)
+        prefix_letters = self.getPrefixLetters(request)
         words = []
-        if letters:
+        if prefix_letters:
+            words = map(self.dictionary.getScore, itertools.islice(self.dictionary.getWordsStartingWithPrefixContainingLetters(prefix_letters, letters), 0, 1000))
+        elif letters:
             # get a maximum of the first 1000 words which seems like more than anyone is likely to look at:
             words = list(itertools.islice(reversed(self.dictionary.getScrabbleWordsWithWildcards(letters)), 0, 1000))
         request.setResponseCode(http.OK)
