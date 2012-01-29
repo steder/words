@@ -47,15 +47,18 @@ class DictionaryResource(resource.Resource):
     def getPrefixLetters(self, request):
         return self.getLetterArg("prefix_letters", request)
 
-    # def getSuffixLetters(self, request):
-    #     return self.getLetterArg("suffix_letters", request)
+    def getSuffixLetters(self, request):
+        return self.getLetterArg("suffix_letters", request)
 
     def handle_GET(self, request):
         letters = self.getLetters(request)
         prefix_letters = self.getPrefixLetters(request)
+        suffix_letters = self.getSuffixLetters(request)
         words = []
         if prefix_letters:
             words = map(self.dictionary.getScore, itertools.islice(self.dictionary.getWordsStartingWithPrefixContainingLetters(prefix_letters, letters), 0, 1000))
+        elif suffix_letters:
+            words = map(self.dictionary.getScore, itertools.islice(self.dictionary.getWordsEndingWithSuffixContainingLetters(suffix_letters, letters), 0, 1000))
         elif letters:
             # get a maximum of the first 1000 words which seems like more than anyone is likely to look at:
             words = list(itertools.islice(reversed(self.dictionary.getScrabbleWordsWithWildcards(letters)), 0, 1000))
@@ -79,6 +82,8 @@ class DictionaryResource(resource.Resource):
 
     def render_GET(self, request):
         letters = self.getLetters(request)
+        prefix_letters = self.getPrefixLetters(request)
+        suffix_letters = self.getSuffixLetters(request)
         if len(letters) > 10:
             return json.dumps([
                 [0, "Please use 10 characters or less"],
@@ -90,6 +95,26 @@ class DictionaryResource(resource.Resource):
         elif letters == "":
             return json.dumps([
                 [0, "Please enter up to 10 letters (including 3 \'*\' wildcards)"]
+                ])
+        elif prefix_letters.count("*") > 0:
+            return json.dumps([
+                [0, "Please enter up to 10 prefix letters (but no wildcards!)"]
+                ])
+        elif len(prefix_letters) > 10:
+            return json.dumps([
+                [0, "Please enter up to 10 prefix letters"]
+                ])
+        elif suffix_letters.count("*") > 0:
+            return json.dumps([
+                [0, "Please enter up to 10 suffix letters (but no wildcards!)"]
+                ])
+        elif len(suffix_letters) > 10:
+            return json.dumps([
+                [0, "Please enter up to 10 suffix letters"]
+                ])
+        elif suffix_letters and prefix_letters:
+            return json.dumps([
+                [0, "Specify either suffix or prefix (not both)"]
                 ])
         else:
             self.d = threads.deferToThread(self.handle_GET, request)
