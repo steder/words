@@ -18,7 +18,7 @@ from twisted.web import server
 
 
 # for validating the input:
-pattern = "[^abcdefghijklmnopqrstuvwxyABCDEFGHIJKLMNOPQRSTUVWXYZ*]+"
+pattern = "[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*]+"
 regex = re.compile(pattern)
 
 
@@ -57,8 +57,10 @@ class DictionaryResource(resource.Resource):
         words = []
         if prefix_letters:
             words = map(self.dictionary.getScore, itertools.islice(self.dictionary.getWordsStartingWithPrefixContainingLetters(prefix_letters, letters), 0, 1000))
+            words.sort(key=lambda x: x[0], reverse=True)
         elif suffix_letters:
             words = map(self.dictionary.getScore, itertools.islice(self.dictionary.getWordsEndingWithSuffixContainingLetters(suffix_letters, letters), 0, 1000))
+            words.sort(key=lambda x: x[0], reverse=True)
         elif letters:
             # get a maximum of the first 1000 words which seems like more than anyone is likely to look at:
             words = list(itertools.islice(reversed(self.dictionary.getScrabbleWordsWithWildcards(letters)), 0, 1000))

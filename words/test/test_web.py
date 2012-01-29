@@ -87,6 +87,7 @@ class TestJsonDictionaryResource(unittest.TestCase):
         self.dictionary.insertWord("hello")
         self.dictionary.insertWord("foo")
         self.dictionary.insertWord("foobar")
+        self.dictionary.insertWord("barbaz")
         self.dictionary.insertWord("foobarbaz")
         self.server = MockServer(self.dictionary)
         self.root = root.Root(self.server)
@@ -104,7 +105,7 @@ class TestJsonDictionaryResource(unittest.TestCase):
         self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
         return self.r.d
 
-    def test_getScrabbleWords_letters_EHLLO(self):
+    def test_getScrabbleWords_letters_oneWord(self):
         request = test_web.DummyRequest([''])
         request.args["letters"] = ["EHLLO"]
         request.method = "GET"
@@ -115,6 +116,20 @@ class TestJsonDictionaryResource(unittest.TestCase):
             self.assertEqual(request.written, ['[[9, "hello"]]'])
         self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
         return self.r.d
+
+    def test_getScrabbleWords_letters_twoWords(self):
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["foobar"]
+        request.method = "GET"
+        rval = self.r.render(request)
+        self.assertEqual(rval, server.NOT_DONE_YET)
+        def cb(result, request):
+            self.assertEqual(result, [(12, "foobar"),
+                                      (6, "foo")])
+            self.assertEqual(request.written, ['[[12, "foobar"], [6, "foo"]]'])
+        self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
+        return self.r.d
+
 
     def test_tooManyLetters(self):
         request = test_web.DummyRequest([''])
@@ -161,6 +176,22 @@ class TestJsonDictionaryResource(unittest.TestCase):
         self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
         return self.r.d
 
+    def test_prefixLettersMultipleResults(self):
+        """
+        Confirm prefix multiple results are sorted
+        """
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["bazbar"]
+        request.args["prefix_letters"] = ["foo"]
+        rval = self.r.render(request)
+        self.assertEqual(rval, server.NOT_DONE_YET)
+        def cb(result, request):
+            self.assertEqual(result, [(27, "foobarbaz"),
+                                      (12, "foobar")])
+            self.assertEqual(request.written, ['[[27, "foobarbaz"], [12, "foobar"]]'])
+        self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
+        return self.r.d
+
     def test_tooManyPrefixLetters(self):
         """Confirm that >10 prefix letters causes an error message"""
         request = test_web.DummyRequest([''])
@@ -191,6 +222,22 @@ class TestJsonDictionaryResource(unittest.TestCase):
         def cb(result, request):
             self.assertEqual(result, [(12, "foobar")])
             self.assertEqual(request.written, ['[[12, "foobar"]]'])
+        self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
+        return self.r.d
+
+    def test_suffixLettersMultipleResults(self):
+        """
+        Confirm multiple suffix results are sorted
+        """
+        request = test_web.DummyRequest([''])
+        request.args["letters"] = ["foobar"]
+        request.args["suffix_letters"] = ["baz"]
+        rval = self.r.render(request)
+        self.assertEqual(rval, server.NOT_DONE_YET)
+        def cb(result, request):
+            self.assertEqual(result, [(27, "foobarbaz"),
+                                      (21, "barbaz")])
+            self.assertEqual(request.written, ['[[27, "foobarbaz"], [21, "barbaz"]]'])
         self.r.d.addCallbacks(cb, self.fail, callbackArgs=(request,))
         return self.r.d
 
