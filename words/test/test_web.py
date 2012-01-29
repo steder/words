@@ -55,7 +55,6 @@ class TestDictionaryResource(unittest.TestCase):
 
     def test_failure(self):
         def fail(*args, **kwargs):
-            print "Fail being called"
             raise Exception("Failing on purpose")
         self.r.handle_GET = fail
 

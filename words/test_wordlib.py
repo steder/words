@@ -412,22 +412,80 @@ class TestPrefixLookupsWithLetters(unittest.TestCase):
 
     """
     WORDS = ["bar",
-             "baz",
              "bazil",
              "bazooka",
              "bazill",
-             "bingo"]
+             "bin",
+             "bingo",
+             "binge"]
 
     def setUp(self):
         self.dictionary = wordlib.Dictionary()
         for word in self.WORDS:
             self.dictionary.insertWord(word)
 
-    def test_startsWithBazAndHandContainsGzrilpt(self):
-        #self.assertEqual(self.dictionary.getWordsEndingWith("grate"),
-        #                 ["denigrate", "grate", "integrate"])
+    def test_noWords(self):
+        self.assertEqual(
+            self.dictionary.getWordsStartingWithPrefixContainingLetters("bra",
+                                                                        "la"),
+            []
+            )
+
+    def test_startsWithWordPrefixAndHandCanSpellOne(self):
+        self.assertEqual(
+            self.dictionary.getWordsStartingWithPrefixContainingLetters("bin", "go"),
+            ["bingo"]
+        )
+
+    def test_startsWithNonWordPrefixAndHandCanSpellOne(self):
         self.assertEqual(
             self.dictionary.getWordsStartingWithPrefixContainingLetters("baz", "gzrilpt"),
             ["bazil"]
         )
+
+    def test_startsWithWordAndHandCanSpellTwo(self):
+        self.assertEqual(
+            self.dictionary.getWordsStartingWithPrefixContainingLetters("bin", "goe"),
+            ["binge", "bingo"]
+        )
+
+
+class TestSuffixLookupsWithLetters(unittest.TestCase):
+    WORDS = ["age",
+             "sausage",
+             "baggage",
+             "ruffage",]
+
+    def setUp(self):
+        self.dictionary = wordlib.Dictionary()
+        for word in self.WORDS:
+            self.dictionary.insertWord(word)
+
+    def test_noWords(self):
+        self.assertEqual(
+            self.dictionary.getWordsEndingWithSuffixContainingLetters("bra",
+                                                                        "la"),
+            []
+            )
+
+    def test_startsWithWordSuffixAndHandCanSpellOne(self):
+        self.assertEqual(
+            self.dictionary.getWordsEndingWithSuffixContainingLetters("age", "assu"),
+            ["sausage"]
+        )
+
+    def test_startsWithNonWordPrefixAndHandCanSpellOne(self):
+        self.assertEqual(
+            self.dictionary.getWordsEndingWithSuffixContainingLetters("ge", "a"),
+            ["age"]
+        )
+
+    def test_startsWithWordAndHandCanSpellTwo(self):
+        self.assertEqual(
+            self.dictionary.getWordsEndingWithSuffixContainingLetters("age", "baggruff"),
+            ["baggage", "ruffage"]
+        )
+
+
+
 

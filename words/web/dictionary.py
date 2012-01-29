@@ -67,7 +67,6 @@ class DictionaryResource(resource.Resource):
 
     def render_GET(self, request):
         letters = self.getLetters(request)
-        print "letters: '%s'"%(letters,)
         if len(letters) > 10:
             return json.dumps([
                 [0, "Please use 10 characters or less"],

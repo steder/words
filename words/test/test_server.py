@@ -35,7 +35,6 @@ class TestWordsServerStart(unittest.TestCase):
         return result
 
     def _startShouldNotFail(self, failure):
-        print failure
         self.fail("start should succeed!")
         return failure
 

@@ -276,35 +276,73 @@ class Dictionary(object):
 
         return words
 
-    def depthFirstWords(self, letters, trieNode, accumulator):
+    def depthFirstWords(self, trieNode, letterAccumulator="", wordAccumulator=None):
         """
         Recursive depth first traversal of the tree to retrieve all
         the child words
 
+        :arg trieNode: the current trie node
+        :arg letterAccumulator: all the letters visited so far
+        :arg wordAccumulator: all the words retrieved so far
+
+        :returns: wordAccumulator
+
         """
+        wordAccumulator = wordAccumulator if wordAccumulator is not None else []
         for letter, node in trieNode.iteritems():
             if letter != EOW and node:
                 if node.get(EOW, False):
-                    accumulator.append("".join(letters + letter))
-                self.depthFirstWords(letters+letter, node, accumulator)
-        return accumulator
+                    wordAccumulator.append("".join(letterAccumulator + letter))
+                self.depthFirstWords(node, letterAccumulator+letter, wordAccumulator)
+        return wordAccumulator
 
-    def getWordsFromTrieWithTransform(self, trie, letters, transform):
+    def depthFirstWordsWithRequiredLetters(self, trieNode, required, letterAccumulator="", wordAccumulator=None):
+        """
+        Recursive depth first traversal of the tree to retrieve all
+        the child words that include `required` letters.
+
+        :arg trieNode: the current trie node
+        :arg required: any child worlds should include one of these required letters
+        :arg letterAccumulator: all the letters visited so far
+        :arg wordAccumulator: all the words retrieved so far
+
+        :returns: wordAccumulator
+
+        """
+        wordAccumulator = wordAccumulator if wordAccumulator is not None else []
+        for letter, node in trieNode.iteritems():
+            if letter != EOW and node and letter in required:
+                # create a copy of required without letter:
+                remainingRequired = required.replace(letter, "", 1)
+                # if we're on a word (indicated by End of Word marker)
+                if node.get(EOW, False):
+                    wordAccumulator.append("".join(letterAccumulator + letter))
+                # if we have more letters available continue down the tree
+                if remainingRequired:
+                    self.depthFirstWordsWithRequiredLetters(node, remainingRequired, letterAccumulator+letter, wordAccumulator)
+        return wordAccumulator
+
+    def getWordsFromTrieWithTransform(self, trie, initialLetters,
+                                      transform, requiredLetters=None):
         """
         Apply `transform` to `letters` and return words in `trie` that
-        match include the transformed letters.
+        include the transformed letters.
 
-        :arg trie:
+        :arg trie: the trie instance to search for words
         :type trie: dict
-        :arg letters:
-        :type letters: str
-        :arg transform:
+        :arg initialLetters: the starting word or prefix letters
+        :type initialLetters: str
+        :arg transform: mutates the input (reverses, etc)
         :type transform: callable
-        :returns: list
+        :arg requiredLetters: required letters after initialLetters
+        :type requiredLetters: str
 
+        :returns: list of words
+
+        TODO: rename this
         """
         trieNode = trie
-        letters = transform(letters)
+        letters = transform(initialLetters)
         for letter in letters:
             trieNode = trieNode.get(letter, None)
             if not trieNode:
@@ -314,7 +352,10 @@ class Dictionary(object):
         if trieNode.get(EOW, False):
             words.append("".join(letters))
 
-        self.depthFirstWords(letters, trieNode, words)
+        if requiredLetters:
+            words.extend(self.depthFirstWordsWithRequiredLetters(trieNode, requiredLetters, letters))
+        else:
+            words.extend(self.depthFirstWords(trieNode, letters))
 
         words = [transform(word) for word in words]
         words.sort()
@@ -333,8 +374,36 @@ class Dictionary(object):
         identity = lambda x: x
         return self.getWordsFromTrieWithTransform(self.trie, letters, identity)
 
-    def getWordsStartingWithPrefixContainingLetters(self, prefix, letters):
-        return []
+    def getWordsStartingWithPrefixContainingLetters(self, prefixLetters, requiredLetters):
+        """
+        Return all words that can be made with `requiredLetters` that begin with
+        `prefixLetters`.
+        """
+        prefixLetters = prefixLetters.strip().lower()
+        requiredLetters = requiredLetters.strip().lower()
+        identity = lambda x: x
+        words = self.getWordsFromTrieWithTransform(self.trie, prefixLetters, identity, requiredLetters)
+        # we don't want to include the starting prefix:
+        if words and words[0] == prefixLetters:
+            return words[1:]
+        else:
+            return words
+
+    def getWordsEndingWithSuffixContainingLetters(self, suffixLetters, requiredLetters):
+        """
+        Return all words that can be made with `requiredLetters` that begin with
+        `prefixLetters`.
+        """
+        suffixLetters = suffixLetters.strip().lower()
+        requiredLetters = requiredLetters.strip().lower()
+        reverseString = lambda x: "".join(reversed(x))
+        words = self.getWordsFromTrieWithTransform(self.suffixTrie, suffixLetters,
+                                                   reverseString, requiredLetters)
+        # we don't want to include the starting prefix:
+        if words and words[0] == suffixLetters:
+            return words[1:]
+        else:
+            return words
 
     @cleanWord
     def getWordsEndingWith(self, letters):
