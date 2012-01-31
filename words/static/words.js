@@ -9,6 +9,10 @@ penzilla.words.Dictionary = function (input_id, output_id, button_id) {
 
     $("#advanced").click(function (event) {
         $("#advanced_options").toggle();
+        var prefix_letters = document.getElementById("prefix_letters");
+        var suffix_letters = document.getElementById("suffix_letters");
+        prefix_letters.value = "";
+        suffix_letters.value = "";
     });
 
     $.ajaxSetup({
@@ -36,20 +40,33 @@ penzilla.words.Dictionary.prototype.getScrabbleWords = function () {
     var resultTable = document.getElementById(self.output_id);
 
     var onSuccess = function(data) {
-        console.log("got data");
+        console.log("got " + String(data.length) + " words...");
+
         var resultBody = document.createElement("tbody");
-        for (var e in data) {
-            console.log("word: " + String(data[e][0]) + " "
-                        + String(data[e][1]));
+        if (data.length > 0) {
+            for (var e in data) {
+                console.log("word: " + String(data[e][0]) + " "
+                            + String(data[e][1]));
+                var tr = document.createElement("tr");
+                var wordTd = document.createElement("td");
+                var pointsTd = document.createElement("td");
+                wordTd.innerHTML = data[e][1];
+                pointsTd.innerHTML = data[e][0];
+                tr.appendChild(wordTd);
+                tr.appendChild(pointsTd);
+                resultBody.appendChild(tr);
+            };
+        }
+        else {
             var tr = document.createElement("tr");
-            var wordTd = document.createElement("td");
+            var wordsTd = document.createElement("td");
             var pointsTd = document.createElement("td");
-            wordTd.innerHTML = data[e][1];
-            pointsTd.innerHTML = data[e][0];
+            wordsTd.innerHTML = "No words found";
+            pointsTd.innerHTML = "0";
             tr.appendChild(wordTd);
             tr.appendChild(pointsTd);
             resultBody.appendChild(tr);
-        };
+        }
         resultTable.appendChild(resultBody);
         // remove old results
         resultTable.removeChild(resultTable.tBodies[0]);
@@ -60,11 +77,11 @@ penzilla.words.Dictionary.prototype.getScrabbleWords = function () {
     console.log("letters:" + letters);
     var data = {"letters":letters};
     var prefix_letters = document.getElementById("prefix_letters").value;
+    var suffix_letters = document.getElementById("suffix_letters").value;
     if (prefix_letters) {
         console.log("Adding prefix_letters");
         data["prefix_letters"] = prefix_letters;
     }
-    var suffix_letters = document.getElementById("suffix_letters").value;
     if (suffix_letters) {
         console.log("Adding suffix_letters");
         data["suffix_letters"] = suffix_letters;
