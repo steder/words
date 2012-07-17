@@ -5,7 +5,7 @@
 
 NAME=words
 APP=words
-RUNDIR=/home/steder/Words/current
+RUNDIR=/home/steder/Words
 TWISTD=/usr/local/bin/twistd
 PID=/var/run/$NAME.pid
 LOGFILE=/var/log/$NAME/$NAME.log
@@ -13,13 +13,17 @@ DESCRIPTION="Twistd Service"
 TB_UID=`id -u steder`
 TB_GID=`id -g steder`
 
+NEW_RELIC_CONFIG_FILE=/home/steder/Words/etc/newrelic.ini
+NEWRELIC_ADMIN=`which newrelic-admin`
+NEWRELIC_SUBCOMMAND="run-program"
+
 test -f $TWISTD || exit 0
 
 . /lib/lsb/init-functions
 
 case "$1" in
 	start)	log_daemon_msg "Starting $DESCRIPTION" "$NAME"
-		start-stop-daemon --start --verbose --chdir $RUNDIR --pidfile $PID --name $NAME --startas $TWISTD -- --logfile="$LOGFILE" --rundir="$RUNDIR" --pidfile="$PID" --uid=$TB_UID --gid=$TB_GID $APP
+		start-stop-daemon --start --verbose --chdir $RUNDIR --pidfile $PID --name $NAME --startas $NEWRELIC_ADMIN $NEWRELIC_SUBCOMMAND $TWISTD -- --logfile="$LOGFILE" --rundir="$RUNDIR" --pidfile="$PID" --uid=$TB_UID --gid=$TB_GID $APP
 		log_end_msg $?
 		;;
 	stop)	log_daemon_msg "Stopping $DESCRIPTION" "$NAME"
